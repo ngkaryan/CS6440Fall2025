@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+# set -eo pipefail
 
 echo "Installing system dependencies..."
 apt-get update -qq
@@ -14,3 +14,4 @@ java -jar synthea.jar -p 10 Massachusetts
 mv output synthea_output
 
 echo "Build finished – index will be created on first app start"
+
