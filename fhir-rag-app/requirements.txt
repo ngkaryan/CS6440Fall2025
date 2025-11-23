@@ -1,0 +1,11 @@
+faiss-cpu
+tiktoken
+fastapi
+uvicorn[standard]
+google-generativeai
+pydantic
+matplotlib
+pandas
+tqdm
+sentence-transformers
+nest-asyncio
