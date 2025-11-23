@@ -106,6 +106,68 @@ def load_index():
     logging.info(f"Loaded index with {index.ntotal} vectors")
     return index, embeddings, texts
 
+def build_faiss_index_dedup_v3():
+    print("\n" + "="*60)
+    print("BUILDING DEDUPLICATED INDEX")
+    print("="*60)
+
+    seen_ids = set()
+    unique_resources = []
+    stats = {}
+
+    for path in sorted(glob.glob("synthea_output/fhir/*.json")):
+        fname = os.path.basename(path)
+        try:
+            with open(path) as f:
+                bundle = json.load(f)
+            if bundle.get("resourceType") != "Bundle": continue
+            entries = bundle.get("entry", [])
+            print(f" {fname:25} → {len(entries):4} entries", end="")
+            new = 0
+            for entry in entries:
+                res = entry.get("resource", {})
+                res_id = res.get("id")
+                if not res_id and "fullUrl" in entry:
+                    res_id = entry["fullUrl"].split("/")[-1]
+                if res_id and res_id not in seen_ids:
+                    seen_ids.add(res_id)
+                    unique_resources.append(res)
+                    rt = res.get("resourceType", "Unknown")
+                    stats[rt] = stats.get(rt, 0) + 1
+                    new += 1
+            print(f" → +{new} new")
+        except Exception as e:
+            print(f"\n FAILED {fname}: {e}")
+
+    print(f"\n→ TOTAL UNIQUE: {len(unique_resources)}")
+    for t, c in sorted(stats.items(), key=lambda x: -x[1]):
+        print(f" {t:12}: {c}")
+
+    print("\n2. Flattening...")
+    all_texts = []
+    for r in tqdm(unique_resources, desc="Flattening", unit="res"):
+        txt = fhir_to_text(r)
+        if txt.strip():
+            all_texts.extend(chunk_text(txt))
+
+    # SAFETY DEDUP
+    all_texts = list(dict.fromkeys(all_texts))
+    print(f"→ DEDUPLICATED CHUNKS: {len(all_texts)}")
+
+    print("\n3. Embedding...")
+    embeddings = get_embeddings_smart(all_texts)
+    if not embeddings:
+        return None, all_texts
+
+    print("\n4. FAISS...")
+    arr = np.array(embeddings, dtype=np.float32)
+    index = faiss.IndexFlatL2(arr.shape[1])
+    index.add(arr)
+    print(f"→ {index.ntotal} vectors, dim={arr.shape[1]}")
+
+    return index, all_texts
+
+
 def build_faiss():
     # (your full build_faiss_index_dedup_v3 function – paste unchanged)
     # ... exactly the same code you already have ...
@@ -156,4 +218,5 @@ async def nl_fhir_query(q: str = Query(...), mode: str = "table", top_k: int = 1
     return {"results": hits}
 
 @app.get("/health")
+
 async def health(): return {"status": "ok", "vectors": app.state.faiss_index.ntotal}
