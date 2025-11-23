@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 echo "Installing system dependencies..."
 apt-get update -qq
@@ -12,5 +12,6 @@ echo "Generating 10 patients (~2–3 minutes)..."
 rm -rf synthea_output output
 java -jar synthea.jar -p 10 Massachusetts
 mv output synthea_output
+
 
 echo "Build finished – index will be created on first app start"
