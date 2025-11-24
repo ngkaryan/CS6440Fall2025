@@ -1,4 +1,5 @@
 # app.py
+'''
 import os
 import logging
 import pickle
@@ -57,3 +58,15 @@ async def nl_fhir_query(q: str = Query(...), top_k: int = 10):
 @app.get("/health")
 async def health():
     return {"status": "ok", "vectors": app.state.faiss_index.ntotal}
+
+'''
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"status": "ok", "msg": "dummy deploy working"}
+
+
