@@ -1,5 +1,5 @@
 # app.py
-'''
+
 import os
 import logging
 import pickle
@@ -12,9 +12,9 @@ import google.generativeai as genai
 logging.basicConfig(level=logging.INFO)
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-INDEX_FILE = "faiss_index.bin"
-EMB_FILE = "embeddings.npy"
-TEXT_FILE = "index_texts.pkl"
+INDEX_FILE = "/mnt/data/faiss_index.bin"
+EMB_FILE = "/mnt/data/embeddings.npy"
+TEXT_FILE = "/mnt/data/index_texts.pkl"
 
 def load_index():
     if not all(os.path.exists(f) for f in (INDEX_FILE, EMB_FILE, TEXT_FILE)):
@@ -69,4 +69,5 @@ app = FastAPI()
 def home():
     return {"status": "ok", "msg": "dummy deploy working"}
 
+'''
 
