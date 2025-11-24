@@ -1,12 +1,13 @@
-# faiss-cpu
-# tiktoken
+faiss-cpu
+tiktoken
 fastapi
 uvicorn[standard]
-# google-generativeai
-# pydantic# 
-# matplotlib
-# pandas
-# tqdm
-# sentence-transformers
+google-generativeai
+pydantic# 
+matplotlib
+pandas
+tqdm
+sentence-transformers
 
-# nest-asyncio
+nest-asyncio
+
