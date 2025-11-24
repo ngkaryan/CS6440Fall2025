@@ -3,11 +3,12 @@ tiktoken
 fastapi
 uvicorn[standard]
 google-generativeai
-pydantic# 
+pydantic
 matplotlib
 pandas
 tqdm
 sentence-transformers
 nest-asyncio
+
 
 
